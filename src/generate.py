@@ -1,7 +1,10 @@
 import os
 import requests
 import base64
+from deep_translator import GoogleTranslator
 from dotenv import load_dotenv
+
+from translate import Translate
 
 load_dotenv()
 api_host = os.getenv('API_HOST')
@@ -20,8 +23,9 @@ class PicGenerator:
 		self.pic = None
     
 	def set_prompt(self, text):
-		self.prompt = text
-
+		self.prompt = self.translate_prompt(text)
+		print(self.prompt)
+  
 	def get_prompt(self):
 		return self.prompt
 	
@@ -59,6 +63,9 @@ class PicGenerator:
 		if response.status_code != 200:
 			raise Exception("Non-200 response: " + str(response.text))
 		return response.json()
+
+	def translate_prompt(self, text):
+		return GoogleTranslator(source='auto', target='english').translate(text)
 		
 	def load(self):
 		data = self.generate()
