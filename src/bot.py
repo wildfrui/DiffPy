@@ -13,6 +13,24 @@ bot = telebot.TeleBot(bot_key)
 pic = PicGenerator()
 user = User()
 
+
+@bot.message_handler(commands=['repeate'])
+def repeate_prompt(message):
+	global pic
+	if pic.get_last_request() != None:
+		pic.set_prompt(pic.get_last_request()[0])
+		pic.set_pict_style(pic.get_last_request()[1])
+		pic.size = pic.get_last_request()[2]
+		bot.send_message(message.from_user.id, "Подождите пока я генерирую вашу картинку...",
+						 reply_markup=types.ReplyKeyboardRemove())
+		pic_binary = pic.load()
+		bot.send_photo(message.from_user.id, photo=(pic_binary))
+		markup = generate_keyboard_generation(repeateItem=True)
+		bot.send_message(message.from_user.id, "Вы можете продолжить работать с ботом", reply_markup=markup)
+	else:
+		markup = generate_keyboard_generation()
+		bot.send_message(message.chat.id, "Предыдущего запроса нет!", reply_markup=markup)
+
 # подумать где хранить длинный текст
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -20,26 +38,37 @@ def start_message(message):
 	markup = generate_keyboard_generation()
 	bot.send_message(message.chat.id, "Выберите вариант взаимодействия с моделью:", reply_markup=markup)
 	# bot.register_next_step_handler(sent_msg, input_prompt)
- 
+
+
 @bot.message_handler(commands=['help'])
 def show_help(message):
-	bot.send_message(message.chat.id, "Привет! Я могу тебе помочь")
- 
+	balance = user.get_user_balance()
+	markup = generate_keyboard_generation()
+	bot.send_message(message.chat.id, "Привет! Я могу тебе помочь", reply_markup=markup)
+
+
 @bot.message_handler(commands=['balance'])
 def show_balance(message):
 	balance = user.get_user_balance()
-	bot.send_message(message.chat.id, f"Доступно токенов: {balance}")
+	markup = generate_keyboard_generation()
+	bot.send_message(message.chat.id, f"Доступно токенов: {balance}", reply_markup=markup)
  
 @bot.message_handler(commands=['translate'])
 def translate_text(message):
 	balance = user.get_user_balance()
-	bot.send_message(message.chat.id, f"Доступно токенов: {balance}")
+	markup = generate_keyboard_generation()
+	bot.send_message(message.chat.id, f"Доступно токенов: {balance}", reply_markup=markup)
 
 @bot.message_handler(content_types=['text'])
 def input_prompt(message):
 	if message.text == "Генерация по тексту":
 		sent_msg = bot.send_message(message.chat.id, "Напишите текст, который хотите сгенерировать:", reply_markup=types.ReplyKeyboardRemove())
 		bot.register_next_step_handler(sent_msg, choose_style)
+	if message.text == "Повторить предыдущий запрос":
+		bot.send_message(message.chat.id, "Повторяю предыдущий запрос...")
+		repeate_prompt(message)
+		# bot.register_next_step_handler(sent_msg, repeate_prompt)
+
 
 def choose_style(message):
 	global pic
@@ -75,8 +104,9 @@ def generate_pic(message):
 			bot.send_message(message.from_user.id, "Подождите пока я генерирую вашу картинку...", reply_markup=types.ReplyKeyboardRemove())
 			pic_binary = pic.load()
 			bot.send_photo(message.from_user.id, photo = (pic_binary))
-			markup = generate_keyboard_generation()
+			markup = generate_keyboard_generation(repeateItem=True)
 			bot.send_message(message.from_user.id, "Вы можете продолжить работать с ботом", reply_markup=markup)
+
  
 def generate_keyboard_styles():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -96,10 +126,13 @@ def generate_keyboard_sizes():
         '7:9'), types.KeyboardButton('9:7') )
     return markup
 
-def generate_keyboard_generation():
+def generate_keyboard_generation(repeateItem=False):
 	markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
 	item = types.KeyboardButton("Генерация по тексту")
 	markup.add(item)
+	if repeateItem:
+		item = types.KeyboardButton("Повторить предыдущий запрос")
+		markup.add(item)
 	return markup
 
 def check_command(message):
@@ -111,6 +144,9 @@ def check_command(message):
 		return False
 	if message.text == "/balance":
 		show_balance(message)
+		return False
+	if message.text == "/repeate":
+		repeate_prompt(message)
 		return False
 	return True
     

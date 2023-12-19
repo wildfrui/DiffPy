@@ -21,6 +21,12 @@ class PicGenerator:
 		self.size = None
 		self.style_preset = None
 		self.pic = None
+		self.last_request = None
+
+	def set_last_request(self, prompt, style_preset, size):
+		self.last_request = [prompt, style_preset, size]
+	def get_last_request(self):
+		return self.last_request
     
 	def set_prompt(self, text):
 		self.prompt = self.translate_prompt(text)
@@ -70,4 +76,5 @@ class PicGenerator:
 	def load(self):
 		data = self.generate()
 		pic = base64.b64decode(data["artifacts"][0]["base64"])
-		return pic 
+		self.set_last_request(self.get_prompt(), self.get_pict_style(), self.get_pict_size())
+		return pic
