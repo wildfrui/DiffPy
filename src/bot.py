@@ -14,8 +14,8 @@ pic = PicGenerator()
 user = User()
 
 
-@bot.message_handler(commands=['repeate'])
-def repeate_prompt(message):
+@bot.message_handler(commands=['repeat'])
+def repeat_prompt(message):
 	global pic
 	if pic.get_last_request() != None:
 		pic.set_prompt(pic.get_last_request()[0])
@@ -25,7 +25,7 @@ def repeate_prompt(message):
 						 reply_markup=types.ReplyKeyboardRemove())
 		pic_binary = pic.load()
 		bot.send_photo(message.from_user.id, photo=(pic_binary))
-		markup = generate_keyboard_generation(repeateItem=True)
+		markup = generate_keyboard_generation(repeatItem=True)
 		bot.send_message(message.from_user.id, "Вы можете продолжить работать с ботом", reply_markup=markup)
 	else:
 		markup = generate_keyboard_generation()
@@ -66,8 +66,8 @@ def input_prompt(message):
 		bot.register_next_step_handler(sent_msg, choose_style)
 	if message.text == "Повторить предыдущий запрос":
 		bot.send_message(message.chat.id, "Повторяю предыдущий запрос...")
-		repeate_prompt(message)
-		# bot.register_next_step_handler(sent_msg, repeate_prompt)
+		repeat_prompt(message)
+		# bot.register_next_step_handler(sent_msg, repeat_prompt)
 
 
 def choose_style(message):
@@ -104,7 +104,7 @@ def generate_pic(message):
 			bot.send_message(message.from_user.id, "Подождите пока я генерирую вашу картинку...", reply_markup=types.ReplyKeyboardRemove())
 			pic_binary = pic.load()
 			bot.send_photo(message.from_user.id, photo = (pic_binary))
-			markup = generate_keyboard_generation(repeateItem=True)
+			markup = generate_keyboard_generation(repeatItem=True)
 			bot.send_message(message.from_user.id, "Вы можете продолжить работать с ботом", reply_markup=markup)
 
  
@@ -126,11 +126,11 @@ def generate_keyboard_sizes():
         '7:9'), types.KeyboardButton('9:7') )
     return markup
 
-def generate_keyboard_generation(repeateItem=False):
+def generate_keyboard_generation(repeatItem=False):
 	markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
 	item = types.KeyboardButton("Генерация по тексту")
 	markup.add(item)
-	if repeateItem:
+	if repeatItem:
 		item = types.KeyboardButton("Повторить предыдущий запрос")
 		markup.add(item)
 	return markup
@@ -145,8 +145,8 @@ def check_command(message):
 	if message.text == "/balance":
 		show_balance(message)
 		return False
-	if message.text == "/repeate":
-		repeate_prompt(message)
+	if message.text == "/repeat":
+		repeat_prompt(message)
 		return False
 	return True
     
