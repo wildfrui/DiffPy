@@ -13,6 +13,15 @@ bot = telebot.TeleBot(bot_key)
 pic = PicGenerator()
 user = User()
 
+
+# roflan comment
+def roflanpass():
+	pass
+
+
+roflanpass()
+
+
 # подумать где хранить длинный текст
 @bot.message_handler(commands=['start'])
 def start_message(message):
