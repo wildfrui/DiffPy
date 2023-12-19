@@ -4,8 +4,6 @@ import base64
 from deep_translator import GoogleTranslator
 from dotenv import load_dotenv
 
-from translate import Translate
-
 load_dotenv()
 api_host = os.getenv('API_HOST')
 api_key = os.getenv('DIFF_TOKEN')
@@ -25,6 +23,7 @@ class PicGenerator:
 
 	def set_last_request(self, prompt, style_preset, size):
 		self.last_request = [prompt, style_preset, size]
+  
 	def get_last_request(self):
 		return self.last_request
     
