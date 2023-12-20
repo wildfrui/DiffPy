@@ -17,12 +17,13 @@ class PicGenerator:
 	def __init__(self):
 		self.prompt = None
 		self.size = None
+		self.size_key = None
 		self.style_preset = None
 		self.pic = None
 		self.last_request = None
 
-	def set_last_request(self, prompt, style_preset, size):
-		self.last_request = [prompt, style_preset, size]
+	def set_last_request(self, prompt, style_preset, size, size_key):
+		self.last_request = [prompt, style_preset, size, size_key]
   
 	def get_last_request(self):
 		return self.last_request
@@ -35,10 +36,14 @@ class PicGenerator:
 		return self.prompt
 	
 	def set_pict_size(self, size):
+		self.size_key = size
 		self.size = self.sizes[size]
 
 	def get_pict_size(self):
 		return self.size
+
+	def get_pict_size_key(self):
+		return self.size_key
 
 	def set_pict_style(self, style):
 		self.style_preset = style
@@ -75,5 +80,5 @@ class PicGenerator:
 	def load(self):
 		data = self.generate()
 		pic = base64.b64decode(data["artifacts"][0]["base64"])
-		self.set_last_request(self.get_prompt(), self.get_pict_style(), self.get_pict_size())
+		self.set_last_request(self.get_prompt(), self.get_pict_style(), self.get_pict_size(), self.get_pict_size_key())
 		return pic
